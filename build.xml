@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project basedir="." default="build" name="capi-rowcache">
+
+	<property name="cassandra" value="cassandra" />
+	<property name="cassandra.bin" value="${cassandra}/build/classes/main" />
+	<property name="cassandra.build.lib" value="${cassandra}/lib" />
+	<property name="cassandra.build.dir.lib" value="${cassandra}/build/lib" />
+
+	<property name="capi" value="capisim" />
+	<property name="capi.build.lib" value="${capi}/capiblock.jar" />
+
+	<property name="capi.rowcache.jar" value="dist/capi.rowcache.jar" />
+	<property name="capi.rowcache.build.dir" value="bin" />
+
+	<property name="debuglevel" value="source,lines,vars" />
+
+	<target depends="build-subprojects,build-project" name="build" />
+
+	<target name="clean">
+		<delete dir="capi.rowcache.build.dir/*" />
+		<delete file="${capi.build.lib}" />
+	</target>
+	
+	<target name="cleanall" depends="clean">
+		<exec dir="YCSB" executable="mvn">
+			<arg value="clean" />
+		</exec>
+		<ant dir="${cassandra}" target="clean" />
+	</target>
+			
+	<target name="build-subprojects">
+		<ant dir="${cassandra}" target="build" />
+		<ant dir="${capi}" target="build" />
+		<exec dir="YCSB" executable="mvn">
+			<arg value="compile" />
+		</exec>
+	</target>
+
+	<path id="cassandra.classpath">
+		<fileset dir="${cassandra.build.lib}">
+			<include name="**/*.jar" />
+			<exclude name="**/*-sources.jar" />
+		</fileset>
+		<fileset dir="${cassandra.build.dir.lib}">
+			<include name="**/*.jar" />
+			<exclude name="**/*-sources.jar" />
+		</fileset>
+	</path>
+
+	<target name="build-project">
+		<javac debug="true" debuglevel="${debuglevel}" srcdir="src" destdir="${capi.rowcache.build.dir}">
+			<classpath refid="cassandra.classpath" />
+			<classpath>
+				<fileset dir="./" includes="${capi.build.lib}" />
+			</classpath>
+			<classpath path="${cassandra.bin}" />
+		</javac>
+		<jar destfile="${capi.rowcache.jar}" basedir="${capi.rowcache.build.dir}" />
+	</target>
+	<target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects" />
+</project>
