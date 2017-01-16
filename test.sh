@@ -22,7 +22,7 @@ rm -rf $CASSANDRA/data/
 rm /tmp/test.txt
 
 # start Cassandra
-rm -f $CASSANDRA/logs
+rm -rf $CASSANDRA/logs
 if [ `whoami` = "root" ]; then
   JVM_OPTS="-Dcapi.hash=org.apache.cassandra.cache.capi.YCSBKeyHashFunction" $CASSANDRA/bin/cassandra -R
 else
