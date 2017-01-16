@@ -18,12 +18,15 @@ ps aux | grep java | grep CassandraDaemon | awk '{print $2}' | xargs kill 2> /de
 # clear cassandra data
 rm -rf $CASSANDRA/data/
 
+# clear capisim file
+rm /tmp/test.txt
+
 # start Cassandra
 rm -f $CASSANDRA/logs
 if [ `whoami` = "root" ]; then
-  $CASSANDRA/bin/cassandra -R
+  JVM_OPTS="-Dcapi.hash=org.apache.cassandra.cache.capi.YCSBKeyHashFunction" $CASSANDRA/bin/cassandra -R
 else
-  $CASSANDRA/bin/cassandra
+  JVM_OPTS="-Dcapi.hash=org.apache.cassandra.cache.capi.YCSBKeyHashFunction" $CASSANDRA/bin/cassandra
 fi
 
 while true; do
