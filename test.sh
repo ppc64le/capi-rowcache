@@ -9,7 +9,7 @@ CASSANDRA=cassandra
 cp $CAPI/capiblock.jar $CASSANDRA/lib/
 cp dist/*.jar $CASSANDRA/lib/
 cp conf/* $CASSANDRA/conf/
-mv $CASSANDRA/lib/jna-4.0.0.jar $CASSANDRA/lib/jna-4.0.0.jar.bak
+if [ -f $CASSANDRA/lib/jna-4.0.0.jar ]; then mv $CASSANDRA/lib/jna-4.0.0.jar $CASSANDRA/lib/jna-4.0.0.jar.bak; fi
 cp lib/jna*.jar $CASSANDRA/lib/
 
 # kill if Cassandra daemon exists
@@ -20,7 +20,11 @@ rm -rf $CASSANDRA/data/
 
 # start Cassandra
 rm -f $CASSANDRA/logs
-$CASSANDRA/bin/cassandra
+if [ `whoami` = "root" ]; then
+  $CASSANDRA/bin/cassandra -R
+else
+  $CASSANDRA/bin/cassandra
+fi
 
 while true; do
   sleep 1

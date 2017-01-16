@@ -17,17 +17,17 @@
 
 3. call ant
 
-
 	```
 	$ ant
 	```
 	
 ## how to run YCSB
 
+1. run the following script. you can find the detail steps in this shell.
+
 	```
 	$ ./test.sh
 	```
 
-
-
+2. check the cassandra/logs/system.log
 
