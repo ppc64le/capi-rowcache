@@ -48,6 +48,7 @@
 	</path>
 
 	<target name="build-project">
+		<mkdir dir="${capi.rowcache.build.dir}"/>
 		<javac debug="true" debuglevel="${debuglevel}" srcdir="src" destdir="${capi.rowcache.build.dir}">
 			<classpath refid="cassandra.classpath" />
 			<classpath>

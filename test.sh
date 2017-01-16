@@ -9,6 +9,8 @@ CASSANDRA=cassandra
 cp $CAPI/capiblock.jar $CASSANDRA/lib/
 cp dist/*.jar $CASSANDRA/lib/
 cp conf/* $CASSANDRA/conf/
+mv $CASSANDRA/lib/jna-4.0.0.jar $CASSANDRA/lib/jna-4.0.0.jar.bak
+cp lib/jna*.jar $CASSANDRA/lib/
 
 # kill if Cassandra daemon exists
 ps aux | grep java | grep CassandraDaemon | awk '{print $2}' | xargs kill 2> /dev/null
