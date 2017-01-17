@@ -57,4 +57,4 @@ EOF
 
 cd YCSB
 bin/ycsb load cassandra2-cql -P workloads/workloadc -p operationcount=1000000000 -p recordcount=10000 -p fieldcount=10 -p fieldlength=100 -p requestdistribution=uniform -p hosts=localhost -threads 1 -s
-bin/ycsb run cassandra2-cql -P workloads/workloadc -p operationcount=1000000000 -p recordcount=10000 -p fieldcount=10 -p fieldlength=100 -p requestdistribution=uniform -p hosts=localhost -threads 1 -s
+bin/ycsb run cassandra2-cql -P workloads/workloadc -p maxexecutiontime=180 -p operationcount=1000000000 -p recordcount=10000 -p fieldcount=10 -p fieldlength=100 -p requestdistribution=uniform -p hosts=localhost -threads 1 -s
