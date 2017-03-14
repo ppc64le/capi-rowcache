@@ -1,6 +1,5 @@
 package org.apache.cassandra.cache;
 
-
 import java.io.IOException;
 import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
@@ -65,7 +64,7 @@ public class CapiRowCacheProvider implements org.apache.cassandra.cache.CachePro
         final ReentrantLock[] monitors = new ReentrantLock[Runtime.getRuntime().availableProcessors() * 64];
 
         CapiRowCache(long capacity) {
-            this.map = new ConcurrentLinkedHashMap.Builder<RowCacheKey, IRowCacheEntry>().weigher(new Weigher<IRowCacheEntry>() {
+            this.map = new ConcurrentLinkedHashMap.Builder<RowCacheKey, IRowCacheEntry>().initialCapacity((int) capacity).weigher(new Weigher<IRowCacheEntry>() {
                 public int weightOf(IRowCacheEntry value) {
                     long serializedSize = serializer.serializedSize(value);
                     if (serializedSize > Integer.MAX_VALUE)
@@ -618,6 +617,9 @@ public class CapiRowCacheProvider implements org.apache.cassandra.cache.CachePro
             return get(key) != null;
         }
 
+        void clearForTest() {
+            map.clear();
+        }
     }
 
     static long logUnit = 100000L;

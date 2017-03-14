@@ -5,6 +5,9 @@
 	<classpathentry kind="src" path="cassandra/interface/thrift/gen-java"/>
 	<classpathentry kind="src" path="cassandra/src/gen-java"/>
 	<classpathentry kind="src" path="capisim/src"/>
+	<classpathentry kind="src" path="cassandra/test/unit"/>
+	<classpathentry kind="src" path="conf"/>
+	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="cassandra/build/lib/jars/ant-1.9.4.jar"/>
 	<classpathentry kind="lib" path="cassandra/build/lib/jars/ant-junit-1.9.4.jar"/>
