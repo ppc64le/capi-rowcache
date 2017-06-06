@@ -2,11 +2,3 @@
 	path = cassandra
 	url = git://git.apache.org/cassandra.git
 	ignore = dirty
-[submodule "capisim"]
-	path = capisim
-	url = https://github.com/bedrisendir/capisim
-	ignore = dirty
-[submodule "YCSB"]
-	path = YCSB
-	url = https://github.com/brianfrankcooper/YCSB
-	ignore = dirty
