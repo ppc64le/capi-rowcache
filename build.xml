@@ -8,7 +8,7 @@
 
 	<property name="capiblock.lib" value="lib/capiblock.jar" />
 
-	<property name="capi.rowcache.jar" value="dist/capi.rowcache.jar" />
+	<property name="capi.rowcache.jar" value="dist/capi-rowcache.jar" />
 	<property name="capi.rowcache.build.dir" value="bin" />
 
 	<property name="debuglevel" value="source,lines,vars" />
