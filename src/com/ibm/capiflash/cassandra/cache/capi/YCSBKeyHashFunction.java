@@ -1,8 +1,8 @@
-package org.apache.cassandra.cache.capi;
+package com.ibm.capiflash.cassandra.cache.capi;
 
 import java.util.Arrays;
 
-import org.apache.cassandra.cache.CapiRowCacheProvider.HashFunction;
+import com.ibm.capiflash.cassandra.cache.CapiRowCacheProvider.HashFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

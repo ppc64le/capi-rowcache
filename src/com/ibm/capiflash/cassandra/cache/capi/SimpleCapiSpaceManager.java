@@ -1,11 +1,11 @@
-package org.apache.cassandra.cache.capi;
+package com.ibm.capiflash.cassandra.cache.capi;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.cassandra.cache.capi.CapiChunkDriver.AsyncHandler;
+import com.ibm.capiflash.cassandra.cache.capi.CapiChunkDriver.AsyncHandler;
 
 import com.ibm.research.capiblock.CapiBlockDevice;
 

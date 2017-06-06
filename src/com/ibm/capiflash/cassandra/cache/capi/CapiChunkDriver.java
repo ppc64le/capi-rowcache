@@ -1,4 +1,4 @@
-package org.apache.cassandra.cache.capi;
+package com.ibm.capiflash.cassandra.cache.capi;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

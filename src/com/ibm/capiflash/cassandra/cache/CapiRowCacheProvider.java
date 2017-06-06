@@ -1,4 +1,4 @@
-package org.apache.cassandra.cache;
+package com.ibm.capiflash.cassandra.cache;
 
 import java.io.IOException;
 import java.nio.BufferOverflowException;
@@ -10,9 +10,10 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.apache.cassandra.cache.RowCacheKey;
+import org.apache.cassandra.cache.ICache;
+import org.apache.cassandra.cache.IRowCacheEntry;
 import org.apache.cassandra.cache.SerializingCacheProvider.RowCacheSerializer;
-import org.apache.cassandra.cache.capi.CapiChunkDriver;
-import org.apache.cassandra.cache.capi.SimpleCapiSpaceManager;
 import org.apache.cassandra.config.DatabaseDescriptor;
 import org.apache.cassandra.io.ISerializer;
 import org.apache.cassandra.io.util.DataInputBuffer;
@@ -23,6 +24,8 @@ import org.slf4j.LoggerFactory;
 
 import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
 import com.googlecode.concurrentlinkedhashmap.Weigher;
+import com.ibm.capiflash.cassandra.cache.capi.CapiChunkDriver;
+import com.ibm.capiflash.cassandra.cache.capi.SimpleCapiSpaceManager;
 import com.ibm.research.capiblock.CapiBlockDevice;
 
 public class CapiRowCacheProvider implements org.apache.cassandra.cache.CacheProvider<RowCacheKey, IRowCacheEntry> {
