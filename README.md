@@ -21,7 +21,7 @@
 	$ ant
 	```
 	
-## how to run YCSB
+## how to run cassandra using - "capiblock.jar"
 
 1. run the following script. you can find the detail steps in this shell.
 
