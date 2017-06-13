@@ -2,24 +2,16 @@
 
 set -x
 
-CAPI=capisim
 CASSANDRA=cassandra
 
 # setup
-cp $CAPI/capiblock.jar $CASSANDRA/lib/
-cp dist/*.jar $CASSANDRA/lib/
-cp conf/* $CASSANDRA/conf/
-if [ -f $CASSANDRA/lib/jna-4.0.0.jar ]; then mv $CASSANDRA/lib/jna-4.0.0.jar $CASSANDRA/lib/jna-4.0.0.jar.bak; fi
-cp lib/jna*.jar $CASSANDRA/lib/
+cp lib/capiblock.jar $CASSANDRA/lib/
 
 # kill if Cassandra daemon exists
 ps aux | grep java | grep CassandraDaemon | awk '{print $2}' | xargs kill 2> /dev/null
 
 # clear cassandra data
 rm -rf $CASSANDRA/data/
-
-# clear capisim file
-rm /tmp/test.txt
 
 # start Cassandra
 rm -rf $CASSANDRA/logs
@@ -55,6 +47,3 @@ create table usertable (
 exit
 EOF
 
-cd YCSB
-bin/ycsb load cassandra2-cql -P workloads/workloadc -p operationcount=1000000000 -p recordcount=10000 -p fieldcount=10 -p fieldlength=100 -p requestdistribution=uniform -p hosts=localhost -threads 1 -s
-bin/ycsb run cassandra2-cql -P workloads/workloadc -p maxexecutiontime=180 -p operationcount=1000000000 -p recordcount=10000 -p fieldcount=10 -p fieldlength=100 -p requestdistribution=uniform -p hosts=localhost -threads 1 -s
