@@ -7,7 +7,8 @@
 	<property name="cassandra.build.dir.lib" value="${cassandra}/build/lib" />
 
 	<property name="capiblock.lib" value="lib/capiblock.jar" />
-
+	
+	<property name="capi.rowcache.dir" value="dist" />
 	<property name="capi.rowcache.jar" value="dist/capi-rowcache.jar" />
 	<property name="capi.rowcache.build.dir" value="bin" />
 
@@ -17,6 +18,7 @@
 
 	<target name="clean">
 		<delete dir="${capi.rowcache.build.dir}" />
+		<delete dir="${capi.rowcache.dir}" />
 	</target>
 	
 	<target name="cleanall" depends="clean">
