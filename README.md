@@ -23,7 +23,7 @@ Go to the [release page](https://github.com/hhorii/capi-rowcache/releases) and d
 
 ## How to run
 
-CAPI-RowCache was tested on Cassandra 3.11. It should work with other 3.x releases, too. If you need help in running CAPI-RowCache on other versions of Cassandra, please raise an issue.
+CAPI-RowCache was tested on Cassandra 3.10. It should work with other 3.x releases, too. If you need help in running CAPI-RowCache on other versions of Cassandra, please raise an issue.
 
 This section explains how to run CAPI-RowCache with a machine with CAPI-Flash. The next section describes how to run CAPI-RowCache in the emulation mode.
 
