@@ -13,6 +13,8 @@ CAPI-Flash provides high-throughput low-latency access to flash storage. With th
 
 [Apache Cassandra](http://cassandra.apache.org) is an open source, non-relational, horizontally scalable, distributed database management system. When serving thousands of read operations per second per node, Cassandra is typically bottlenecked by disk I/O. The read path of Cassandra can include an in-memory cache, called RowCache, but when the cache misses, Cassandra must read the data from disks. These disk I/O activities suffer from high latency. Even if flash SSDs are used instead of spinning disks, there still remains overhead in the file system and the device driver.
 
+CAPI-RowCache naturally extends the original in-memory RowCache mechanism to high-throughput low-latency CAPI-Flash. You no longer need large expensive DRAM to cache your data in memory. Instead, you can exploit inexpensive flash storage but still do not suffer from the overhead in the OS. CAPI-RowCache is to optimize read-intensive workloads. We will soon release another CAPI-Flash exploitation for Apache Cassandra to optimize write-intensive workloads.
+
 ## Download
 
 Go to the [release page](https://github.com/hhorii/capi-rowcache/releases) and download the latest capi-rowcache.jar and capiblock.jar.
@@ -75,4 +77,4 @@ $ git submodule update
 $ ant
 ```
 
-4. Find `capi-rowcache.jar` in the `dist` directory.
+4. Find `capi-rowcache.jar` generated in the `dist` directory.
