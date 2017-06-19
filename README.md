@@ -1,6 +1,6 @@
 # Overview of CAPI-RowCache
 
-This project extends the RowCache of Apache Cassandra with CAPI-Flash. All of the cached data are stored in large flash devices through a high-throughput low-latency FPGA-based accelerator, [CAPI-Flash](https://www.ibm.com/power/solutions/bigdata-analytics-data-engine-nosql). CAPI-RowCache is a plug-in jar to Apache Cassandra. On a POWER Linux machine with CAPI-Flash installed, CAPI-RowCache is enabled by placing [capi-rowcache.jar](https://github.com/hhorii/capi-rowcache/releases/download/v0.1/capi-rowcache.jar) and associated [capiblock.jar](https://github.com/hhorii/capi-rowcache/releases/download/v0.1/capiblock.jar) to Cassandra's `lib` directory and by specifying necessary properties to the JVM.
+This project extends the RowCache of [Apache Cassandra](http://cassandra.apache.org) with CAPI-Flash. All of the cached data are stored in large flash devices through a high-throughput low-latency FPGA-based accelerator, [CAPI-Flash](https://www.ibm.com/power/solutions/bigdata-analytics-data-engine-nosql). CAPI-RowCache is a plug-in jar to Apache Cassandra. On a POWER Linux machine with CAPI-Flash installed, CAPI-RowCache is enabled by placing [capi-rowcache.jar](https://github.com/hhorii/capi-rowcache/releases/download/v0.1/capi-rowcache.jar) and associated [capiblock.jar](https://github.com/hhorii/capi-rowcache/releases/download/v0.1/capiblock.jar) to Cassandra's `lib` directory and by specifying necessary properties to the JVM.
 
 ## CAPI-Flash (also known as IBM Data Engine for NoSQL)
 
@@ -11,7 +11,7 @@ CAPI-Flash provides high-throughput low-latency access to flash storage. With th
 
 ## CAPI-RowCache for Apache Cassandra
 
-[Apache Cassandra](http://cassandra.apache.org) is an open source, non-relational, horizontally scalable, distributed database management system. When serving thousands of read operations per second per node, Cassandra is typically bottlenecked by disk I/O. The read path of Cassandra can include an in-memory cache, called RowCache, but when the cache misses, Cassandra must read the data from disks. These disk I/O activities suffer from high latency. Even if flash SSDs are used instead of spinning disks, there still remains overhead in the file system and the device driver.
+Apache Cassandra is an open source, non-relational, horizontally scalable, distributed database management system. When serving thousands of read operations per second per node, Cassandra is typically bottlenecked by disk I/O. The read path of Cassandra can include an in-memory cache, called RowCache, but when the cache misses, Cassandra must read the data from disks. These disk I/O activities suffer from high latency. Even if flash SSDs are used instead of spinning disks, there still remains overhead in the file system and the device driver.
 
 CAPI-RowCache naturally extends the original in-memory RowCache mechanism to high-throughput low-latency CAPI-Flash. You no longer need large expensive DRAM to cache your data in memory. Instead, you can exploit inexpensive flash storage but still do not suffer from the overhead in the OS. CAPI-RowCache is to optimize read-intensive workloads. We will soon release another CAPI-Flash exploitation for Apache Cassandra to optimize write-intensive workloads.
 
