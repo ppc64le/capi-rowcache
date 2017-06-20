@@ -49,7 +49,7 @@ row_cache_class_name: org.apache.cassandra.cache.CapiRowCacheProvider
 -Dcapi.devices=/dev/sg0:0:512
 ```
 
-This means that your CAPI-Flash device is /dev/sg0, the start address of CAPI-RowCache is 0 in the flash address space, and the size of CAPI-RowCache is 512 GB. You can find the CAPI-Flash device on your POWER Linux machine by executing the /opt/ibm/capikv/bin/cxlfstatus command.
+This means that your CAPI-Flash device is /dev/sg0, the start address of CAPI-RowCache is 0 in the flash address space, and the size of CAPI-RowCache is 512 GB. You can find the CAPI-Flash device on your POWER Linux machine by executing the /opt/ibm/capikv/bin/cxlfstatus command. More detailed description about this property can be found in [this page](https://github.com/hhorii/capi-rowcache/wiki/CAPI-RowCache-Wiki).
 
 6. (Optional) If you run [Yahoo! Cloud Serving (System) Benchmark](https://github.com/brianfrankcooper/YCSB) to test CAPI-RowCache, you may want to specify the following property to the JVM for better caching behavior.
 
