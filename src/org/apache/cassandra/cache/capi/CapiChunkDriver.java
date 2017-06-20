@@ -29,13 +29,13 @@ public class CapiChunkDriver {
     public static AtomicLong executed = new AtomicLong();
     public static AtomicLong totalElapsed = new AtomicLong();
 
-    public static boolean pooled = System.getProperty("capi.driver.task.nopool") == null;
-    public static int numOfMaxThreads = Integer.parseInt(System.getProperty("capi.driver.thread.max", "32"));
-    public static int numOfMinThreads = Integer.parseInt(System.getProperty("capi.driver.thread.min", "16"));
-    public static int numOfQueue = Integer.parseInt(System.getProperty("capi.driver.queue", "4"));
-    public static int FLUSH_QUEUE_MAX_DEPTH = Integer.parseInt(System.getProperty("capi.driver.queue.max", "10000"));
+    public static boolean pooled = System.getProperty("com.ibm.capiflash.cassandra.cache.driver.task.nopool") == null;
+    public static int numOfMaxThreads = Integer.parseInt(System.getProperty("com.ibm.capiflash.cassandra.cache.driver.thread.max", "32"));
+    public static int numOfMinThreads = Integer.parseInt(System.getProperty("com.ibm.capiflash.cassandra.cache.driver.thread.min", "16"));
+    public static int numOfQueue = Integer.parseInt(System.getProperty("com.ibm.capiflash.cassandra.cache.driver.queue", "4"));
+    public static int FLUSH_QUEUE_MAX_DEPTH = Integer.parseInt(System.getProperty("com.ibm.capiflash.cassandra.cache.driver.queue.max", "10000"));
 
-    public static boolean polling = System.getProperty("capi.driver.thread.polling") != null;
+    public static boolean polling = System.getProperty("com.ibm.capiflash.cassandra.cache.driver.thread.polling") != null;
 
     public static int getAlignedSize(int size) {
         return getLBASize(size) * CapiBlockDevice.BLOCK_SIZE;
