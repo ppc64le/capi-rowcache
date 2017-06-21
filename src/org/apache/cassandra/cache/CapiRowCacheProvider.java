@@ -30,7 +30,7 @@ public class CapiRowCacheProvider implements org.apache.cassandra.cache.CachePro
 
     public static final int DEFAULT_L2CACHE = 128 * 1024 * 1024;
     public static final int DEFAULT_CONCURENCY_LEVEL = 64;
-    public static final String PROP_CAPI_DEVICE_NAMES = "capi.devices";
+    public static final String PROP_CAPI_DEVICE_NAMES = "com.ibm.capiflash.cassandra.cache.devices";
     public static final long DEFAULT_SIZE_IN_GB_BYTES = 1L; // 1 gb
 
     public static AtomicLong touched = new AtomicLong();
@@ -74,7 +74,7 @@ public class CapiRowCacheProvider implements org.apache.cassandra.cache.CachePro
                 }
             }).maximumWeightedCapacity(DEFAULT_L2CACHE).concurrencyLevel(DEFAULT_CONCURENCY_LEVEL).build();
 
-            String hashClass = System.getProperty("capi.hash");
+            String hashClass = System.getProperty("com.ibm.capiflash.cassandra.cache.hash");
             try {
                 hashFunc = hashClass == null ? new HashFunction() {
                     public int hashCode(byte[] key) {
@@ -90,8 +90,8 @@ public class CapiRowCacheProvider implements org.apache.cassandra.cache.CachePro
             }
 
             int blocksize = CapiBlockDevice.BLOCK_SIZE;
-            int numOfAsync = Integer.parseInt(System.getProperty("capi.async", "64"));
-            int numOfDriver = Integer.parseInt(System.getProperty("capi.driver", "32"));
+            int numOfAsync = Integer.parseInt(System.getProperty("com.ibm.capiflash.cassandra.cache.async", "64"));
+            int numOfDriver = Integer.parseInt(System.getProperty("com.ibm.capiflash.cassandra.cache.driver", "32"));
 
             String deviceNamesStr = System.getProperty(PROP_CAPI_DEVICE_NAMES);
             if (deviceNamesStr == null) {
@@ -101,7 +101,7 @@ public class CapiRowCacheProvider implements org.apache.cassandra.cache.CachePro
 
             this.sm = new SimpleCapiSpaceManager();
 
-            // -Dcapi.devices=/dev/sg7:<OFFSET>:<GB_SIZE>:/dev/sg7:/dev/sg8:/dev/sg8,/dev/sdc:<OFFSET>:<GB_SIZE>
+            // -Dcom.ibm.capiflash.cassandra.cache.devices=/dev/sg7:<OFFSET>:<GB_SIZE>:/dev/sg7:/dev/sg8:/dev/sg8,/dev/sdc:<OFFSET>:<GB_SIZE>
             String[] deviceInfos = deviceNamesStr.split(",");
 
             StringBuffer storageArea = new StringBuffer();

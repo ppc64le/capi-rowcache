@@ -46,7 +46,7 @@ row_cache_class_name: org.apache.cassandra.cache.CapiRowCacheProvider
 5. Specify the following property to the JVM. Usually, you specify it in Cassandra's conf/jvm.options file.
 
 ```
--Dcapi.devices=/dev/sg0:0:512
+-Dcom.ibm.capiflash.cassandra.cache.devices=/dev/sg0:0:512
 ```
 
 This means that your CAPI-Flash device is /dev/sg0, the start address of CAPI-RowCache is 0 in the flash address space, and the size of CAPI-RowCache is 512 GB. You can find the CAPI-Flash device on your POWER Linux machine by executing the /opt/ibm/capikv/bin/cxlfstatus command. More detailed description about this property can be found in [this page](https://github.com/hhorii/capi-rowcache/wiki/CAPI-RowCache-Wiki).
@@ -76,7 +76,7 @@ row_cache_class_name: org.apache.cassandra.cache.CapiRowCacheProvider
 3. Specify the following properties to the JVM. Usually, you specify them in Cassandra's conf/jvm.options file.
 
 ```
--Dcapi.devices=/path/to/your/capiflash/emulation/file.dat:0:10
+-Dcom.ibm.capiflash.cassandra.cache.devices=/path/to/your/capiflash/emulation/file.dat:0:10
 ```
 
 This means that you will use `/path/to/your/capiflash/emulation/file.dat` to emulate CAPI-Flash. You can specify any regular file. You may want to use a file on tmpfs or `/dev/shm`. `0` means CAPI-RowCache starts at offset 0 in the file, and `10` means CAPI-RowCache will use 10 GB in the file
@@ -91,7 +91,7 @@ This property enables the CAPI-Flash emulation.
 -Dcom.ibm.research.capiblock.capacity=2621440
 ```
 
-This property specifies the size (in 4-KB blocks) of the regular file used for the emulation. It must be larger than the offset plus the size specified in the `capi.devices` property. In this example, `2621440` is equal to 2621440 * 4 KB = 10 GB. Note that this means you will create a 10-GB file on your file system.
+This property specifies the size (in 4-KB blocks) of the regular file used for the emulation. It must be larger than the offset plus the size specified in the `com.ibm.capiflash.cassandra.cache.devices` property. In this example, `2621440` is equal to 2621440 * 4 KB = 10 GB. Note that this means you will create a 10-GB file on your file system.
 
 4. (Optional) If you run [Yahoo! Cloud Serving (System) Benchmark](https://github.com/brianfrankcooper/YCSB) to test CAPI-RowCache, you may want to specify the following property to the JVM for better caching behavior.
 
