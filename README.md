@@ -79,7 +79,7 @@ row_cache_class_name: org.apache.cassandra.cache.CapiRowCacheProvider
 -Dcom.ibm.capiflash.cassandra.cache.devices=/path/to/your/capiflash/emulation/file.dat:0:10
 ```
 
-This means that you will use `/path/to/your/capiflash/emulation/file.dat` to emulate CAPI-Flash. You can specify any regular file. You may want to use a file on tmpfs or `/dev/shm`. `0` means CAPI-RowCache starts at offset 0 in the file, and `10` means CAPI-RowCache will use 10 GB in the file
+This means that you will use `/path/to/your/capiflash/emulation/file.dat` to emulate CAPI-Flash. You can specify any regular file. You may want to use a file on tmpfs or `/dev/shm`. `0` after the first `:` means CAPI-RowCache starts at offset 0 in the file, and `10` after the second `:` means CAPI-RowCache will use 10 GB in the file.
 
 ```
 -Dcom.ibm.research.capiblock.emulation=true
