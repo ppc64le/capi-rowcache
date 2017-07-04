@@ -51,6 +51,12 @@ row_cache_class_name: org.apache.cassandra.cache.CapiRowCacheProvider
 
 This means that your CAPI-Flash device is /dev/sg0, the start address of CAPI-RowCache is 0 in the flash address space, and the size of CAPI-RowCache is 512 GB. You can find the CAPI-Flash device on your POWER Linux machine by executing the /opt/ibm/capikv/bin/cxlfstatus command. More detailed description about this property can be found in [this page](https://github.com/hhorii/capi-rowcache/wiki/CAPI-RowCache-Wiki).
 
+```
+-Xss328k
+```
+Incase you're running this on a POWER Linux machine , this property specifies the per-thread stack size needed , the default value of `-Xss256k` causes JVM crashes on POWER. So it's best advised to increase this property value to atleast `328k`.
+
+
 6. (Optional) If you run [Yahoo! Cloud Serving (System) Benchmark](https://github.com/brianfrankcooper/YCSB) to test CAPI-RowCache, you may want to specify the following property to the JVM for better caching behavior.
 
 ```
@@ -93,11 +99,18 @@ This property enables the CAPI-Flash emulation.
 
 This property specifies the size (in 4-KB blocks) of the regular file used for the emulation. It must be larger than the offset plus the size specified in the `com.ibm.capiflash.cassandra.cache.devices` property. In this example, `2621440` is equal to 2621440 * 4 KB = 10 GB. Note that this means you will create a 10-GB file on your file system.
 
+```
+-Xss328k
+```
+Incase you're running this on a POWER Linux machine , this property specifies the per-thread stack size needed , the default value of `-Xss256k` causes JVM crashes on POWER. So it's best advised to increase this property value to atleast `328k`.
+
+
 4. (Optional) If you run [Yahoo! Cloud Serving (System) Benchmark](https://github.com/brianfrankcooper/YCSB) to test CAPI-RowCache, you may want to specify the following property to the JVM for better caching behavior.
 
 ```
 -Dcapi.hash=org.apache.cassandra.cache.capi.YCSBKeyHashFunction
 ```
+
 
 ## How to build
 
