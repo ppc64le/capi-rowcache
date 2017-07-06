@@ -19,11 +19,11 @@ To run CAPI-RowCache at its full speed, you need a POWER Linux machine with a CA
 
 ## Download
 
-Go to the [release page](https://github.com/hhorii/capi-rowcache/releases) and download the latest capi-rowcache.jar and capiblock.jar.
+Go to the [release page](https://github.com/hhorii/capi-rowcache/releases) and download the latest capi-rowcache.jar and capiblock.jar. For Cassandra 4.x, download capi-rowcache-4.jar instead of capi-rowcache.jar.
 
 ## How to run
 
-CAPI-RowCache was tested on Cassandra 3.10. It should work with other 3.x releases, too. If you need help in running CAPI-RowCache on other versions of Cassandra, please raise an issue.
+CAPI-RowCache was tested on Cassandra 3.10 and 4.x. It should work with other 3.x releases, too. If you need help in running CAPI-RowCache on other versions of Cassandra, please raise an issue.
 
 This section explains how to run CAPI-RowCache with a machine with CAPI-Flash. The next section describes how to run CAPI-RowCache in the emulation mode.
 
@@ -33,14 +33,26 @@ This section explains how to run CAPI-RowCache with a machine with CAPI-Flash. T
 
 3. Copy the downloaded jar files to Cassandra's lib directory.
 
+Cassandra 3.x:
 ```
 $ cp /path/to/capi-rowcache.jar /path/to/capiblock.jar /path/to/your/cassandra/lib
 ```
 
+Cassandra 4.x:
+```
+$ cp /path/to/capi-rowcache-4.jar /path/to/capiblock.jar /path/to/your/cassandra/lib
+```
+
 4. Add the following line to Cassandra's conf/cassandra.yaml file.
 
+Cassandra 3.x:
 ```
 row_cache_class_name: org.apache.cassandra.cache.CapiRowCacheProvider
+```
+
+Cassandra 4.x:
+```
+row_cache_class_name: com.ibm.capiflash.cassandra.cache.CapiRowCacheProvider
 ```
 
 5. Specify the following property to the JVM. Usually, you specify it in Cassandra's conf/jvm.options file.
@@ -54,8 +66,14 @@ This means that your CAPI-Flash device is /dev/sg0, the start address of CAPI-Ro
 
 6. (Optional) If you run [Yahoo! Cloud Serving (System) Benchmark](https://github.com/brianfrankcooper/YCSB) to test CAPI-RowCache, you may want to specify the following property to the JVM for better caching behavior.
 
+Cassandra 3.x:
 ```
 -Dcapi.hash=org.apache.cassandra.cache.capi.YCSBKeyHashFunction
+```
+
+Cassandra 4.x:
+```
+-Dcapi.hash=com.ibm.capiflash.cassandra.cache.capi.YCSBKeyHashFunction
 ```
 
 ## How to run with CAPI-Flash emulation
@@ -64,14 +82,26 @@ We provide an emulation mode in which CAPI-Flash is emulated by a regular file o
 
 1. Copy the downloaded jar files to Cassandra's lib directory.
 
+Cassandra 3.x:
 ```
 $ cp /path/to/capi-rowcache.jar /path/to/capiblock.jar /path/to/your/cassandra/lib
 ```
 
+Cassandra 4.x:
+```
+$ cp /path/to/capi-rowcache-4.jar /path/to/capiblock.jar /path/to/your/cassandra/lib
+```
+
 2. Add the following line to Cassandra's conf/cassandra.yaml file.
 
+Cassandra 3.x:
 ```
 row_cache_class_name: org.apache.cassandra.cache.CapiRowCacheProvider
+```
+
+Cassandra 4.x:
+```
+row_cache_class_name: com.ibm.capiflash.cassandra.cache.CapiRowCacheProvider
 ```
 
 3. Specify the following properties to the JVM. Usually, you specify them in Cassandra's conf/jvm.options file.
@@ -97,8 +127,14 @@ This property specifies the size (in 4-KB blocks) of the regular file used for t
 
 4. (Optional) If you run [Yahoo! Cloud Serving (System) Benchmark](https://github.com/brianfrankcooper/YCSB) to test CAPI-RowCache, you may want to specify the following property to the JVM for better caching behavior.
 
+Cassandra 3.x:
 ```
 -Dcapi.hash=org.apache.cassandra.cache.capi.YCSBKeyHashFunction
+```
+
+Cassandra 4.x:
+```
+-Dcapi.hash=com.ibm.capiflash.cassandra.cache.capi.YCSBKeyHashFunction
 ```
 
 ## Running Apache Cassandra on ppc64le
@@ -116,7 +152,13 @@ If you want to build CAPI-RowCache from source, follow these steps.
 $ git clone https://github.com/hhorii/capi-rowcache
 ```
 
-2. Initialize and load submodules.
+2. **Cassandra 4.x only:** Check out a branch for Cassandra 4.x.
+
+```
+$ git checkout plugin-distribution-4.x
+```
+
+3. Initialize and load submodules.
 
 ```
 $ cd capi-rowcache
@@ -124,10 +166,10 @@ $ git submodule init
 $ git submodule update
 ```
 
-3. Call ant.
+4. Call ant.
 
 ```
 $ ant
 ```
 
-4. Find `capi-rowcache.jar` generated in the `dist` directory.
+5. Find `capi-rowcache.jar` generated in the `dist` directory.
