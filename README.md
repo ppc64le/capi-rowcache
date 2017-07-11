@@ -172,4 +172,4 @@ $ git submodule update
 $ ant
 ```
 
-5. Find `capi-rowcache.jar` generated in the `dist` directory.
+5. Find `capi-rowcache.jar` (or `capi-rowcache-4.jar` for Cassandra 4.x) generated in the `dist` directory.
