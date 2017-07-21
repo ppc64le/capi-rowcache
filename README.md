@@ -17,6 +17,10 @@ CAPI-RowCache naturally extends the original in-memory RowCache mechanism to hig
 
 To run CAPI-RowCache at its full speed, you need a POWER Linux machine with a CAPI-Flash card, but we also provide an emulation mode in which CAPI-Flash is emulated by a regular file on a file system. Using the emulation mode, you can try CAPI-RowCache on a POWER Linux machine without a CAPI-Flash card or even on an x86 Linux machine.
 
+## Performance results
+
+Performance results can be found in [this page](https://github.com/hhorii/capi-rowcache/wiki/CAPI-RowCache-Performance).
+
 ## Download
 
 Go to the [release page](https://github.com/hhorii/capi-rowcache/releases) and download the latest capi-rowcache.jar and capiblock.jar. For Cassandra 4.x, download capi-rowcache-4.jar instead of capi-rowcache.jar.
