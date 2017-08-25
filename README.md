@@ -1,6 +1,6 @@
 # Overview of CAPI-RowCache
 
-This project extends the RowCache of [Apache Cassandra](http://cassandra.apache.org) with CAPI-Flash. All of the cached data are stored in large flash devices through a high-throughput low-latency FPGA-based accelerator, [CAPI-Flash](https://www.ibm.com/power/solutions/bigdata-analytics-data-engine-nosql). CAPI-RowCache is a plug-in jar to Apache Cassandra. On a POWER Linux machine with CAPI-Flash installed, CAPI-RowCache is enabled by placing [capi-rowcache.jar](https://github.com/hhorii/capi-rowcache/releases/download/v0.1/capi-rowcache.jar) and associated [capiblock.jar](https://github.com/hhorii/capi-rowcache/releases/download/v0.1/capiblock.jar) to Cassandra's `lib` directory and by specifying necessary properties to the JVM.
+This project extends the RowCache of [Apache Cassandra](http://cassandra.apache.org) with CAPI-Flash. All of the cached data are stored in large flash devices through a high-throughput low-latency FPGA-based accelerator, [CAPI-Flash](https://www.ibm.com/power/solutions/bigdata-analytics-data-engine-nosql). CAPI-RowCache is a plug-in jar to Apache Cassandra. On a POWER Linux machine with CAPI-Flash installed, CAPI-RowCache is enabled by placing [capi-rowcache.jar](https://github.com/ppc64le/capi-rowcache/releases/download/v0.1/capi-rowcache.jar) and associated [capiblock.jar](https://github.com/ppc64le/capi-rowcache/releases/download/v0.1/capiblock.jar) to Cassandra's `lib` directory and by specifying necessary properties to the JVM.
 
 ## CAPI-Flash (also known as IBM Data Engine for NoSQL)
 
@@ -19,11 +19,11 @@ To run CAPI-RowCache at its full speed, you need a POWER Linux machine with a CA
 
 ## Performance results
 
-Performance results can be found in [this page](https://github.com/hhorii/capi-rowcache/wiki/CAPI-RowCache-Performance).
+Performance results can be found in [this page](https://github.com/ppc64le/capi-rowcache/wiki/CAPI-RowCache-Performance).
 
 ## Download
 
-Go to the [release page](https://github.com/hhorii/capi-rowcache/releases) and download the latest capi-rowcache.jar and capiblock.jar. For Cassandra 4.x, download capi-rowcache-4.jar instead of capi-rowcache.jar.
+Go to the [release page](https://github.com/ppc64le/capi-rowcache/releases) and download the latest capi-rowcache.jar and capiblock.jar. For Cassandra 4.x, download capi-rowcache-4.jar instead of capi-rowcache.jar.
 
 ## How to run
 
@@ -153,7 +153,7 @@ If you want to build CAPI-RowCache from source, follow these steps.
 1. Clone this project.
 
 ```
-$ git clone https://github.com/hhorii/capi-rowcache
+$ git clone https://github.com/ppc64le/capi-rowcache
 ```
 
 2. **Cassandra 4.x only:** Check out a branch for Cassandra 4.x.
