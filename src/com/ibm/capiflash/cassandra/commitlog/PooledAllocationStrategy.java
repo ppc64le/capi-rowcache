@@ -22,7 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 class PooledAllocationStrategy implements BufferAllocationStrategy {
-	private static final Logger logger = LoggerFactory.getLogger(PooledAllocationStrategy.class);
+	static final Logger logger = LoggerFactory.getLogger(PooledAllocationStrategy.class);
 
 	private final SimpleCachedCheckSummedBufferPool[] cachedPools = new SimpleCachedCheckSummedBufferPool[1024];
 	private static int maxBufferperPool = 256;

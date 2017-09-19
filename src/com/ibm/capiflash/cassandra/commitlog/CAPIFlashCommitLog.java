@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 import com.ibm.research.capiblock.CapiBlockDevice;
 
 class CAPIFlashCommitLog implements ICommitLog {
-	private static final Logger logger;
+	static final Logger logger;
         static final String PROPERTY_PREFIX;
 	static final String[] DEVICES;
 	static final long START_OFFSET;
@@ -60,8 +60,8 @@ class CAPIFlashCommitLog implements ICommitLog {
 
                 final String STR_devices = System.getProperty(PROP_devices);
                 if (STR_devices == null) {
-                        logger.error("Necessary property " + PROP_devices + " not specified");
-                        throw new IllegalStateException("Necessary property " + PROP_devices + " not specified");
+                        logger.error("Necessary property " + PROPERTY_PREFIX + PROP_devices + " not specified");
+                        throw new IllegalStateException("Necessary property " + PROPERTY_PREFIX + PROP_devices + " not specified");
                 }
                 DEVICES = STR_devices.split(",");
 

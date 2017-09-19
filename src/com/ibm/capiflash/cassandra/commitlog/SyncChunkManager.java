@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 import com.ibm.research.capiblock.Chunk;
 
 class SyncChunkManager extends ChunkManager {
-	private static final Logger logger = LoggerFactory.getLogger(SyncChunkManager.class);
+	static final Logger logger = LoggerFactory.getLogger(SyncChunkManager.class);
 	private final Semaphore semaphore = new Semaphore(CAPIFlashCommitLog.NUMBER_OF_ASYNC_WRITES, false);
 
 	SyncChunkManager(int num_async) {
