@@ -46,4 +46,14 @@ class FixedAllocationStrategy implements BufferAllocationStrategy {
 		buf.clear();
 		buffers.add(buf);
 	}
+
+        @Override
+        public void start() {
+                // Do nothing
+        }
+
+        @Override
+        public void stopUnsafe() {
+                // Do nothing
+        }
 }

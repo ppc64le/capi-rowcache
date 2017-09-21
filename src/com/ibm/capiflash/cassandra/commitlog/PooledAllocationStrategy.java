@@ -25,11 +25,11 @@ class PooledAllocationStrategy implements BufferAllocationStrategy {
 	static final Logger logger = LoggerFactory.getLogger(PooledAllocationStrategy.class);
 
 	private final SimpleCachedCheckSummedBufferPool[] cachedPools = new SimpleCachedCheckSummedBufferPool[1024];
-	private static int maxBufferperPool = 256;
+	private static int maxBufferPerPool = 256;
 	private int largeBufferLimit = 32;
 
 	PooledAllocationStrategy(int bufferCount) {
-		maxBufferperPool = bufferCount;
+		maxBufferPerPool = bufferCount;
 	}
 
 	@Override
@@ -37,7 +37,7 @@ class PooledAllocationStrategy implements BufferAllocationStrategy {
 		int value = (int) (requiredBlocks);
 		if (cachedPools[value] == null) {
 			if (value < largeBufferLimit) {
-				cachedPools[value] = new SimpleCachedCheckSummedBufferPool(maxBufferperPool, value * 4096);
+				cachedPools[value] = new SimpleCachedCheckSummedBufferPool(maxBufferPerPool, value * 4096);
 			} else {
 				cachedPools[value] = new SimpleCachedCheckSummedBufferPool(0, value * 4096);
 			}
@@ -50,4 +50,19 @@ class PooledAllocationStrategy implements BufferAllocationStrategy {
 	public void free(CheckSummedBuffer buf) {
 		cachedPools[buf.blocks].releaseBuffer(buf);
 	}
+
+        @Override
+        public void start() {
+                // Do nothing
+        }
+
+        @Override
+        public void stopUnsafe() {
+                for (int i = 0; i < 1024; i++) {
+                        if (cachedPools[i] != null) {
+                                cachedPools[i].shutdown();
+                                cachedPools[i] = null;
+                        }
+                }
+        }
 }

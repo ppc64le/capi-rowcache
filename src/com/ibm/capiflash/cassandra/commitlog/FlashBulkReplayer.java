@@ -105,9 +105,9 @@ class FlashBulkReplayer {
 	}
 
 	void recover(FlashSegmentManager fsm) throws IOException {
-		for (Integer key : fsm.unCommitted.keySet()) {
+		for (Integer key : fsm.getUnCommitted().keySet()) {
 			buffer.clear();
-			final long segmentId = fsm.unCommitted.get(key);
+			final long segmentId = fsm.getUnCommitted().get(key);
 			int replayPosition;
 			logger.debug("Global=" + globalPosition.segmentId);
 			if (globalPosition.segmentId < segmentId) {
@@ -124,7 +124,7 @@ class FlashBulkReplayer {
 			int serializedSize;
 
 			// read entire block starting from replay position
-			Chunk ch = fsm.bookkeeper;
+			Chunk ch = fsm.getBookkeeper();
 			logger.debug("ReplayPosition for key " + key + " reppos=" + replayPosition);
 			long start = (CAPIFlashCommitLog.DATA_OFFSET + key * CAPIFlashCommitLog.SEGMENT_SIZE_IN_BLOCKS) + replayPosition;
 			long blocks = 0;

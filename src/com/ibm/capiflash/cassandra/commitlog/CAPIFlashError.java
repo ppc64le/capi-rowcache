@@ -17,9 +17,24 @@
  */
 package com.ibm.capiflash.cassandra.commitlog;
 
-interface BufferAllocationStrategy {
-	void free(CheckSummedBuffer buf);
-	CheckSummedBuffer poll(long requiredBlocks);
-        void start();
-        void stopUnsafe();
+import java.io.File;
+import org.apache.cassandra.io.FSError;
+
+public class CAPIFlashError extends FSError
+{
+    public CAPIFlashError(Throwable cause, File path)
+    {
+        super(cause, path);
+    }
+
+    public CAPIFlashError(Throwable cause, String path)
+    {
+        this(cause, new File(path));
+    }
+
+    @Override
+    public String toString()
+    {
+        return "CAPIFlashError in " + path;
+    }
 }

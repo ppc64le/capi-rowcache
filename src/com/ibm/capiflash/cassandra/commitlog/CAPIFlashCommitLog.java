@@ -72,7 +72,12 @@ class CAPIFlashCommitLog implements ICommitLog {
 
                 NUMBER_OF_ASYNC_WRITES = (int)parseOptionalNumberProperty(PROP_number_of_concurrent_writeBlock, "128");
 
-                instance = new CAPIFlashCommitLog();
+                try {
+                        instance = new CAPIFlashCommitLog();
+                        instance.start();
+                } catch (IOException e) {
+                        throw new CAPIFlashError(e, DEVICES[0]);
+                }
         }
 
         static long parseRequiredNumberProperty(final String property) {
@@ -105,37 +110,39 @@ class CAPIFlashCommitLog implements ICommitLog {
                 return value;
         }
 
-	protected CAPIFlashCommitLog() {
-		try {
-			logger.info("Setting up CapiFlash Commitlog");
-			fsm = new FlashSegmentManager(CapiBlockDevice.getInstance().openChunk(DEVICES[0]));
+	protected CAPIFlashCommitLog() throws IOException {
+                logger.info("Setting up CapiFlash Commitlog");
+                fsm = new FlashSegmentManager(DEVICES[0]);
 
-                        final String PROP_chunkmanager_type = PROPERTY_PREFIX + "chunkmanager_type";
-                        final String STR_chunkmanager_type = System.getProperty(PROP_chunkmanager_type, "SyncChunkManager");
-                        if (STR_chunkmanager_type.equals("SyncChunkManager")) {
-                                chunkManager = new SyncChunkManager();
-                        } else if (STR_chunkmanager_type.equals("AsyncChunkManager")) {
-                                chunkManager = new AsyncChunkManager();
-                        } else {
-                                logger.error(STR_chunkmanager_type + " specified by " + PROP_chunkmanager_type + " is unknown");
-                                throw new IllegalStateException(STR_chunkmanager_type + " specified by " + PROP_chunkmanager_type + " is unknown");
-                        }
+                final String PROP_chunkmanager_type = PROPERTY_PREFIX + "chunkmanager_type";
+                final String STR_chunkmanager_type = System.getProperty(PROP_chunkmanager_type, "SyncChunkManager");
+                if (STR_chunkmanager_type.equals("SyncChunkManager")) {
+                        chunkManager = new SyncChunkManager();
+                } else if (STR_chunkmanager_type.equals("AsyncChunkManager")) {
+                        chunkManager = new AsyncChunkManager();
+                } else {
+                        logger.error(STR_chunkmanager_type + " specified by " + PROP_chunkmanager_type + " is unknown");
+                        throw new IllegalStateException(STR_chunkmanager_type + " specified by " + PROP_chunkmanager_type + " is unknown");
+                }
 
-                        final String PROP_buffer_allocator_type = PROPERTY_PREFIX + "buffer_allocator_type";
-                        final String STR_buffer_allocator_type = System.getProperty(PROP_buffer_allocator_type, "FixedSizeAllocationStrategy");
-                        if (STR_buffer_allocator_type.equals("FixedSizeAllocationStrategy")) {
-                                bufferAlloc = new FixedAllocationStrategy();
-                        } else if (STR_buffer_allocator_type.equals("PooledAllocationStrategy")) {
-                                bufferAlloc = new PooledAllocationStrategy(NUMBER_OF_ASYNC_WRITES);
-                        } else {
-                                logger.error(STR_buffer_allocator_type + " specified by " + PROP_buffer_allocator_type + " is unknown");
-                                throw new IllegalStateException(STR_buffer_allocator_type + " specified by " + PROP_buffer_allocator_type + " is unknown");
-                        }
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			System.exit(0);
-		}
+                final String PROP_buffer_allocator_type = PROPERTY_PREFIX + "buffer_allocator_type";
+                final String STR_buffer_allocator_type = System.getProperty(PROP_buffer_allocator_type, "FixedSizeAllocationStrategy");
+                if (STR_buffer_allocator_type.equals("FixedSizeAllocationStrategy")) {
+                        bufferAlloc = new FixedAllocationStrategy();
+                } else if (STR_buffer_allocator_type.equals("PooledAllocationStrategy")) {
+                        bufferAlloc = new PooledAllocationStrategy(NUMBER_OF_ASYNC_WRITES);
+                } else {
+                        logger.error(STR_buffer_allocator_type + " specified by " + PROP_buffer_allocator_type + " is unknown");
+                        throw new IllegalStateException(STR_buffer_allocator_type + " specified by " + PROP_buffer_allocator_type + " is unknown");
+                }
 	}
+
+        private CAPIFlashCommitLog start() throws IOException {
+                fsm.start();
+                chunkManager.start();
+                bufferAlloc.start();
+                return this;
+        }
 
 	/**
 	 * Appends row mutation to CommitLog
@@ -153,7 +160,11 @@ class CAPIFlashCommitLog implements ICommitLog {
                                                       SEGMENT_SIZE_IN_BLOCKS));
 		}
 		FlashRecordAdder adder = null;
-		adder = fsm.allocate(requiredBlocks, rm);
+                try {
+                        adder = fsm.allocate(requiredBlocks, rm);
+                } catch (IOException e) {
+                        throw new CAPIFlashError(e, DEVICES[0]);
+                }
 		//if we are out of space we immediately return to callee and throw exception
 		//callee releases oporder for the current thread when exception occurs
 		if (adder == null) {
@@ -167,11 +178,12 @@ class CAPIFlashCommitLog implements ICommitLog {
 			buf.getBuffer().putLong(buf.calculateCRC(0, 12).getValue()); 
 			Mutation.serializer.serialize(rm, buf.getStream(), MessagingService.current_version);
 			buf.getBuffer().putLong(buf.calculateCRC(20, ((int) totalSize) - 28).getValue()); 
+                        chunkManager.write(adder.getStartBlock(), adder.getRequiredBlocks(), buf);
 		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		chunkManager.write(adder.getStartBlock(), adder.getRequiredBlocks(), buf);
-		bufferAlloc.free(buf);
+                        throw new CAPIFlashError(e, DEVICES[0]);
+		} finally {
+                        bufferAlloc.free(buf);
+                }
 		return new CommitLogPosition(adder.getSegmentID(), adder.getOffset());
 	}
 
@@ -207,7 +219,11 @@ class CAPIFlashCommitLog implements ICommitLog {
 			if (iter.hasNext()) {
 				if (segment.isUnused()) {
 					logger.error("Commit log segment {} is unused ", segment.physical_block_address);
-					fsm.recycleSegment(segment);
+                                        try {
+                                                fsm.recycleSegment(segment);
+                                        } catch (IOException e) {
+                                                throw new CAPIFlashError(e, DEVICES[0]);
+                                        }
 				} else {
 					logger.error("Not safe to delete commit log segment {}; dirty is {} ",
 							segment.physical_block_address, segment.dirtyString());
@@ -215,13 +231,10 @@ class CAPIFlashCommitLog implements ICommitLog {
 			} else {
 				logger.error("Not deleting active commitlog segment {} ", segment.physical_block_address);
 			}
-		     if (segment.contains(upperBound)){
-				logger.error("Segment " + segment.id + " contains the context");
-				break;
-			}
-		}
-		if (fsm.hasAvailableSegments.hasWaiters() && !fsm.freelist.isEmpty()) {
-			fsm.hasAvailableSegments.signalAll();
+                        if (segment.contains(upperBound)) {
+                                logger.error("Segment " + segment.id + " contains the context");
+                                break;
+                        }
 		}
 	}
 
@@ -229,15 +242,10 @@ class CAPIFlashCommitLog implements ICommitLog {
 	 * Recover
 	 */
 	@Override
-	public int recover() {	
-		
+	public int recover() throws IOException {
 		long startTime = System.currentTimeMillis();
 		FlashBulkReplayer r = new FlashBulkReplayer();
-		try {
-			r.recover(fsm);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+                r.recover(fsm);
 		long count = r.blockForWrites();
 		fsm.recycleAfterReplay();
 		long estimatedTime = System.currentTimeMillis() - startTime;
@@ -252,8 +260,8 @@ class CAPIFlashCommitLog implements ICommitLog {
 	@Override
 	public void shutdownBlocking() {
 		try {
-			chunkManager.closeChunks();
-			fsm.bookkeeper.close();
+                        chunkManager.shutdown();
+                        fsm.shutdown();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -262,7 +270,7 @@ class CAPIFlashCommitLog implements ICommitLog {
 	/**/
 	@Override
 	public CommitLogPosition getCurrentPosition() {
-		return fsm.active.getContext();
+		return fsm.getCurrentPosition();
 	}
 
 	static int getBlockCount(long size) {
@@ -285,14 +293,18 @@ class CAPIFlashCommitLog implements ICommitLog {
          */
         @Override
         public int resetUnsafe(boolean deleteSegments) throws IOException {
-                return 0;
+                stopUnsafe(deleteSegments);
+                return restartUnsafe();
         }
 
         /**
          * FOR TESTING PURPOSES
          */
         @Override
-        public void stopUnsafe(boolean deleteSegments) {
+        public void stopUnsafe(boolean deleteSegments) throws IOException {
+                fsm.stopUnsafe(deleteSegments);
+                chunkManager.stopUnsafe();
+                bufferAlloc.stopUnsafe();
         }
 
         /**
@@ -300,6 +312,6 @@ class CAPIFlashCommitLog implements ICommitLog {
          */
         @Override
         public int restartUnsafe() throws IOException {
-                return 0;
+                return start().recover();
         }
 }

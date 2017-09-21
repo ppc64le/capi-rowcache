@@ -60,7 +60,6 @@ class FlashSegmentManager {
 	static final Logger logger = LoggerFactory.getLogger(FlashSegmentManager.class);
 
 	static final ReentrantLock allocationLock = new ReentrantLock();
-	final WaitQueue hasAvailableSegments = new WaitQueue();
 
 	final BlockingQueue<Integer> freelist = new LinkedBlockingQueue<Integer>(CAPIFlashCommitLog.NUMBER_OF_SEGMENTS);
 
@@ -68,33 +67,31 @@ class FlashSegmentManager {
 	ByteBuffer util = ByteBuffer.allocateDirect(1024 * 4);// utility buffer for
 															// bookkeping
 															// purposes
-	static HashMap<String,Integer> chunkLogger = new HashMap<String,Integer>();
 
-	HashMap<Integer, Long> unCommitted;
-	Chunk bookkeeper = null;
-	volatile FlashSegment active;
+	private final HashMap<Integer, Long> unCommitted;
+        private final String bookkeeperDevice;
+	private Chunk bookkeeper = null;
+	private volatile FlashSegment active;
 
-	static final protected ThreadPoolExecutor flushscheduler = (ThreadPoolExecutor) Executors.newFixedThreadPool(
-			DatabaseDescriptor.getFlushWriters(), new NamedThreadFactory("Commitlog Flush", Thread.MAX_PRIORITY));
-
-	FlashSegmentManager(Chunk chunk) {
-		bookkeeper = chunk;
+	FlashSegmentManager(String device) {
+		bookkeeperDevice = device;
 		unCommitted = new HashMap<Integer, Long>();
-		try {// There is only one instance of FSM
-			ByteBuffer recoverMe = ByteBuffer.allocateDirect(1024 * 4 * CAPIFlashCommitLog.NUMBER_OF_SEGMENTS);
-			bookkeeper.readBlock(CAPIFlashCommitLog.START_OFFSET, CAPIFlashCommitLog.NUMBER_OF_SEGMENTS, recoverMe);
-			for (int i = 0; i < CAPIFlashCommitLog.NUMBER_OF_SEGMENTS; i++) {
-				recoverMe.position(i * CapiBlockDevice.BLOCK_SIZE);
-				long segID = recoverMe.getLong();
-				if (segID != 0) {// Committed Segments will be 0 unCommitted
+        }
+
+        void start() throws IOException {
+                bookkeeper = CapiBlockDevice.getInstance().openChunk(bookkeeperDevice);
+
+                ByteBuffer recoverMe = ByteBuffer.allocateDirect(1024 * 4 * CAPIFlashCommitLog.NUMBER_OF_SEGMENTS);
+                bookkeeper.readBlock(CAPIFlashCommitLog.START_OFFSET, CAPIFlashCommitLog.NUMBER_OF_SEGMENTS, recoverMe);
+                for (int i = 0; i < CAPIFlashCommitLog.NUMBER_OF_SEGMENTS; i++) {
+                        recoverMe.position(i * CapiBlockDevice.BLOCK_SIZE);
+                        long segID = recoverMe.getLong();
+                        if (segID != 0) {// Committed Segments will be 0 unCommitted
 									// Segments will contain the unique id
-					logger.error(i + " is uncommitted with segment id " + segID);
-					unCommitted.put(i, segID);
-				}
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+                                logger.error(i + " is uncommitted with segment id " + segID);
+                                unCommitted.put(i, segID);
+                        }
+                }
 
 		for (int i = 0; i < CAPIFlashCommitLog.NUMBER_OF_SEGMENTS; i++) {
 			if (!unCommitted.containsKey(i)) {
@@ -106,44 +103,37 @@ class FlashSegmentManager {
 		activateNextSegment();
 	}
 
-	private void activateNextSegment() {
+	private void activateNextSegment() throws IOException {
 		Integer segid;
 		try {
 			segid = freelist.take();
 			active = new FlashSegment(segid);
-			try {
-				ByteBuffer buf = ByteBuffer.allocateDirect(1024 * 4);
-				logger.error("Activating " + active.getID() + " with PB:" + active.getPB() + " --> "
-						+ (CAPIFlashCommitLog.START_OFFSET + active.getPB()));
-				buf.putLong(active.getID());
-				bookkeeper.writeBlock(CAPIFlashCommitLog.START_OFFSET + active.getPB(), 1, buf);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+
+                        ByteBuffer buf = ByteBuffer.allocateDirect(1024 * 4);
+                        logger.error("Activating " + active.getID() + " with PB:" + active.getPB() + " --> "
+                                     + (CAPIFlashCommitLog.START_OFFSET + active.getPB()));
+                        buf.putLong(active.getID());
+                        bookkeeper.writeBlock(CAPIFlashCommitLog.START_OFFSET + active.getPB(), 1, buf);
 			activeSegments.add(active);
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
 		}
 	}
 
-	void recycleSegment(final FlashSegment segment) {
+	void recycleSegment(final FlashSegment segment) throws IOException {
 		activeSegments.remove(segment);
-		try {
-			logger.error("Recycling " + segment.getID());
-			util.putLong(0);
-			bookkeeper.writeBlock(CAPIFlashCommitLog.START_OFFSET + segment.getPB(), 1, util);
-			util.clear();
-			freelist.add((int) segment.getPB());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+                logger.error("Recycling " + segment.getID());
+                util.putLong(0);
+                bookkeeper.writeBlock(CAPIFlashCommitLog.START_OFFSET + segment.getPB(), 1, util);
+                util.clear();
+                freelist.add((int) segment.getPB());
 	}
 
 	Collection<FlashSegment> getActiveSegments() {
 		return Collections.unmodifiableCollection(activeSegments);
 	}
 
-	FlashRecordAdder allocate(int num_blocks, Mutation rm) {
+	FlashRecordAdder allocate(int num_blocks, Mutation rm) throws IOException {
 		allocationLock.lock();
 		if (freelist.isEmpty()) {
 			allocationLock.unlock();
@@ -159,21 +149,28 @@ class FlashSegmentManager {
 		return offset;
 	}
 
+        CommitLogPosition getCurrentPosition() {
+                return active.getContext();
+        }
+
+        HashMap<Integer, Long> getUnCommitted() {
+                return unCommitted;
+        }
+
+        Chunk getBookkeeper() {
+                return bookkeeper;
+        }
+
 	/**
 	 * Zero all bookkeeping segments
 	 */
-	void recycleAfterReplay() {
+	void recycleAfterReplay() throws IOException {
 		for (Integer key : unCommitted.keySet()) {
-			try {
-				util.clear();
-				util.putLong(0);
-				bookkeeper.writeBlock(CAPIFlashCommitLog.START_OFFSET + key, 1, util);
-				freelist.add(key);
-				hasAvailableSegments.signalAll();
-				logger.error("Recycle after replay activating: " + key);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+                        util.putLong(0);
+                        bookkeeper.writeBlock(CAPIFlashCommitLog.START_OFFSET + key, 1, util);
+                        util.clear();
+                        freelist.add(key);
+                        logger.error("Recycle after replay activating: " + key);
 		}
 		unCommitted.clear();
 	}
@@ -213,21 +210,23 @@ class FlashSegmentManager {
 	void forceRecycleAll(Iterable<TableId> droppedCfs) {
 		// TODO
 	}
-	void printFields(Object obj) throws Exception {
-	    Class<?> objClass = obj.getClass();
-	    Field[] fields = objClass.getFields();
-	    for(Field field : fields) {
-	        String name = field.getName();
-	        Object value = field.get(obj);
-	        if(chunkLogger.containsKey(name)){
-	        	int old = chunkLogger.get(name);
-	        	old+=Integer.valueOf(value.toString());
-	        	chunkLogger.put(name, old);
-	        	
-	        }else{
-	        	chunkLogger.putIfAbsent(name, Integer.valueOf(value.toString()));
-	        }
-	        //System.err.println(name + ": " + value.toString());
-	    }
-	}
+
+        void shutdown() throws IOException {
+                bookkeeper.close();
+        }
+
+        void stopUnsafe(boolean deleteSegments) throws IOException {
+                freelist.clear();
+                activeSegments.clear();
+                unCommitted.clear();
+                if (deleteSegments) {
+                        for (int i = 0; i < CAPIFlashCommitLog.NUMBER_OF_SEGMENTS; i++) {
+                                util.putLong(0);
+                                bookkeeper.writeBlock(CAPIFlashCommitLog.START_OFFSET + i, 1, util);
+                                util.clear();
+                        }
+                }
+                bookkeeper.close();
+                active = null;
+        }
 }

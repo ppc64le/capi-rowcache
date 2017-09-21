@@ -35,12 +35,12 @@ class AsyncChunkManager extends ChunkManager {
 	private AtomicInteger timeout = new AtomicInteger(0);
 	private final Semaphore semaphore = new Semaphore(CAPIFlashCommitLog.NUMBER_OF_ASYNC_WRITES, false);
 
-	AsyncChunkManager(int num_async) {
-		logger.error("[AsyncChunkManager - Devices =  " + CAPIFlashCommitLog.DEVICES.length + "," + num_async + "]");
+	AsyncChunkManager(int numAsync) {
+                super(numAsync);
+		logger.error("[AsyncChunkManager - Devices =  " + CAPIFlashCommitLog.DEVICES.length + "," + numAsync + "]");
 		for (int i = 0; i < CAPIFlashCommitLog.DEVICES.length; i++) {
 			logger.error(CAPIFlashCommitLog.DEVICES[i]);
 		}
-		openChunks(num_async);
 	}
 
 	AsyncChunkManager() {
@@ -48,13 +48,13 @@ class AsyncChunkManager extends ChunkManager {
 	}
 
 	@Override
-	void write(long startOffset, int num_blocks, CheckSummedBuffer buf) {
+	void write(long startOffset, int num_blocks, CheckSummedBuffer buf) throws IOException {
 		Chunk cur = getNextChunk();
 		try {
 			semaphore.acquireUninterruptibly();
 			Future<Long> retval = cur.writeBlockAsync(startOffset, num_blocks, buf.getBuffer());
 			retval.get(2000, TimeUnit.MILLISECONDS);
-		} catch (IOException | InterruptedException | ExecutionException e) {
+		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 		} catch (TimeoutException e) {
 			logger.error(Thread.currentThread().getName() + " timeout. Total Count: " + timeout.incrementAndGet());

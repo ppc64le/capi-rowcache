@@ -30,32 +30,41 @@ abstract class ChunkManager {
 	static final Chunk chunks[] = new Chunk[NUMBER_OF_CHUNKS];
 	final CapiBlockDevice dev = CapiBlockDevice.getInstance();
 	final AtomicInteger nextChunk = new AtomicInteger(0);
+        final int numAsync;
 
-	abstract void write(long l, int m, CheckSummedBuffer buf);
+        ChunkManager(int numAsync) {
+                this.numAsync = numAsync;
+        }
 
-	protected void openChunks(int num_async) {
+	abstract void write(long l, int m, CheckSummedBuffer buf) throws IOException;
+
+        void start() throws IOException {
+                openChunks();
+        }
+
+        void stopUnsafe() throws IOException {
+                closeChunks();
+        }
+
+        void shutdown() throws IOException {
+                closeChunks();
+        }
+
+	private void openChunks() throws IOException {
 		for (int i = 0; i < chunks.length; i++) {
-			try {
-				if (num_async == 0) {
-					// let the device decide max num of requests
-					chunks[i] = dev.openChunk(CAPIFlashCommitLog.DEVICES[i % CAPIFlashCommitLog.DEVICES.length]);
-				} else {
-					// user defined max requests per chunk
-					chunks[i] = dev.openChunk(CAPIFlashCommitLog.DEVICES[i % CAPIFlashCommitLog.DEVICES.length], num_async);
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+                        if (numAsync == 0) {
+                                // let the device decide max num of requests
+                                chunks[i] = dev.openChunk(CAPIFlashCommitLog.DEVICES[i % CAPIFlashCommitLog.DEVICES.length]);
+                        } else {
+                                // user defined max requests per chunk
+                                chunks[i] = dev.openChunk(CAPIFlashCommitLog.DEVICES[i % CAPIFlashCommitLog.DEVICES.length], numAsync);
+                        }
 		}
 	}
 
-	protected void closeChunks() {
+	private void closeChunks() throws IOException {
 		for (int i = 0; i < chunks.length; i++) {
-			try {
-				chunks[i].close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+                        chunks[i].close();
 		}
 	}
 

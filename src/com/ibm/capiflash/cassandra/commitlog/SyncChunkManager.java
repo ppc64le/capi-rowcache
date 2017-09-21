@@ -29,12 +29,12 @@ class SyncChunkManager extends ChunkManager {
 	static final Logger logger = LoggerFactory.getLogger(SyncChunkManager.class);
 	private final Semaphore semaphore = new Semaphore(CAPIFlashCommitLog.NUMBER_OF_ASYNC_WRITES, false);
 
-	SyncChunkManager(int num_async) {
-		logger.error("[SyncChunkManager - Devices =  " + CAPIFlashCommitLog.DEVICES.length + "," + num_async + "]");
+	SyncChunkManager(int numAsync) {
+		super(numAsync);
+		logger.error("[SyncChunkManager - Devices =  " + CAPIFlashCommitLog.DEVICES.length + "," + numAsync + "]");
 		logger.error("[SyncChunkManager - Concurrent Chunk Writers =  "
 				+ CAPIFlashCommitLog.NUMBER_OF_ASYNC_WRITES + "Chunks:"
 				+ NUMBER_OF_CHUNKS);
-		openChunks(num_async);
 	}
 
 	SyncChunkManager() {
@@ -42,15 +42,12 @@ class SyncChunkManager extends ChunkManager {
 	}
 
         @Override
-	void write(long startOffset, int num_blocks, CheckSummedBuffer buf) {
+	void write(long startOffset, int num_blocks, CheckSummedBuffer buf) throws IOException {
 		Chunk cur = getNextChunk();
 		try {
 			semaphore.acquireUninterruptibly();
 			cur.writeBlock(startOffset, num_blocks, buf.getBuffer());
-		} catch (IOException e) {
-			e.printStackTrace();
-		} 
-		finally{
+		} finally {
 			semaphore.release();
 		}
 	}
