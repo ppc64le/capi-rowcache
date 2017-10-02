@@ -1,4 +1,4 @@
 [submodule "cassandra"]
 	path = cassandra
-	url = git://git.apache.org/cassandra.git
+	url = git@github.ibm.com:rodaira/cassandra-pluggable-commitlog.git
 	ignore = dirty
