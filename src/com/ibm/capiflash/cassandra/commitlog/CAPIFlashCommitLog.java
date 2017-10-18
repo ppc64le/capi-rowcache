@@ -58,7 +58,7 @@ class CAPIFlashCommitLog implements ICommitLog {
                 final String PROP_segment_size_in_blocks = "segment_size_in_blocks";
                 final String PROP_number_of_concurrent_writeBlock = "number_of_concurrent_writeBlock";
 
-                final String STR_devices = System.getProperty(PROP_devices);
+                final String STR_devices = System.getProperty(PROPERTY_PREFIX + PROP_devices);
                 if (STR_devices == null) {
                         logger.error("Necessary property " + PROPERTY_PREFIX + PROP_devices + " not specified");
                         throw new IllegalStateException("Necessary property " + PROPERTY_PREFIX + PROP_devices + " not specified");
