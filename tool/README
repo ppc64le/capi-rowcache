@@ -1,0 +1,14 @@
+Utility program to keep track of bookkeeping records.
+
+to compile:
+$ ant
+
+to run:
+$ ./commitlog-util.sh $CASSANDRA_PATH { -r | -d | -h }
+
+-r
+	- Read and print commitlog bookkeeping segments that are in use
+-d
+	- Clears all commitlog book-keeping segments
+-h
+	- Print this help

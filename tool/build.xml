@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project basedir="." default="build" name="capiflash-cassandra-tool">
+  <property name="capiblock.lib" value="../lib/capiblock.jar" />
+  <property name="capiflash.cassandra.tool.build.dir" value="build" />
+  
+  <target name="build">
+    <mkdir dir="${capiflash.cassandra.tool.build.dir}"/>
+    <javac debug="true" srcdir="src" destdir="${capiflash.cassandra.tool.build.dir}">
+      <classpath path="${capiblock.lib}"/>
+    </javac>
+  </target>
+
+  <target name="clean">
+    <delete dir="${capiflash.cassandra.tool.build.dir}" />
+  </target>
+</project>
