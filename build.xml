@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project basedir="." default="build" name="capi-rowcache">
+<project basedir="." default="build" name="capi-commitlog">
 
 	<property name="cassandra" value="cassandra" />
 	<property name="cassandra.bin" value="${cassandra}/build/classes/main" />
@@ -8,17 +8,17 @@
 
 	<property name="capiblock.lib" value="lib/capiblock.jar" />
 	
-	<property name="capi.rowcache.dir" value="dist" />
-	<property name="capi.rowcache.jar" value="dist/capi-rowcache-4.jar" />
-	<property name="capi.rowcache.build.dir" value="bin" />
+	<property name="capi.commitlog.dir" value="dist" />
+	<property name="capi.commitlog.jar" value="dist/capi-commitlog-4.jar" />
+	<property name="capi.commitlog.build.dir" value="bin" />
 
 	<property name="debuglevel" value="source,lines,vars" />
 
 	<target depends="build-subprojects,build-project" name="build" />
 
 	<target name="clean">
-		<delete dir="${capi.rowcache.build.dir}" />
-		<delete dir="${capi.rowcache.dir}" />
+		<delete dir="${capi.commitlog.build.dir}" />
+		<delete dir="${capi.commitlog.dir}" />
 	</target>
 	
 	<target name="cleanall" depends="clean">
@@ -41,13 +41,13 @@
 	</path>
 
 	<target name="build-project">
-		<mkdir dir="${capi.rowcache.build.dir}"/>
-		<javac debug="true" debuglevel="${debuglevel}" srcdir="src" destdir="${capi.rowcache.build.dir}">
+		<mkdir dir="${capi.commitlog.build.dir}"/>
+		<javac debug="true" debuglevel="${debuglevel}" srcdir="src" destdir="${capi.commitlog.build.dir}">
 			<classpath refid="cassandra.classpath" />
 			<classpath path="${cassandra.bin}" />
 			<classpath path="${capiblock.lib}" />
 		</javac>
-		<jar destfile="${capi.rowcache.jar}" basedir="${capi.rowcache.build.dir}" />
+		<jar destfile="${capi.commitlog.jar}" basedir="${capi.commitlog.build.dir}" />
 	</target>
 	<target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects" />
 </project>
