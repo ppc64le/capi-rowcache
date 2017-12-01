@@ -1,6 +1,6 @@
-# Overview of CAPI-RowCache
+# Cassandra Plugin for CAPI-Flash
 
-This project extends the RowCache of [Apache Cassandra](http://cassandra.apache.org) with CAPI-Flash. All of the cached data are stored in large flash devices through a high-throughput low-latency FPGA-based accelerator, [CAPI-Flash](https://www.ibm.com/power/solutions/bigdata-analytics-data-engine-nosql). CAPI-RowCache is a plug-in jar to Apache Cassandra. On a POWER Linux machine with CAPI-Flash installed, CAPI-RowCache is enabled by placing [capi-rowcache.jar](https://github.com/hhorii/capi-rowcache/releases/download/v0.1/capi-rowcache.jar) and associated [capiblock.jar](https://github.com/hhorii/capi-rowcache/releases/download/v0.1/capiblock.jar) to Cassandra's `lib` directory and by specifying necessary properties to the JVM.
+This project provides a plugin for [Apache Cassandra](http://cassandra.apache.org) to use [CAPI-Flash](https://www.ibm.com/power/solutions/bigdata-analytics-data-engine-nosql). This project consists of two components: CAPI-CommitLog and CAPI-RowCache. CAPI-CommitLog stores CommitLog in flash devices through a high-throughput low-latency FPGA-based accelerator, CAPI-Flash. CAPI-RowCache caches read rows in large flash devices through CAPI-Flash. On a POWER Linux machine with CAPI-Flash installed, the CAPI-Flash plugin is enabled by placing [cassandra-capiflash-plugin.jar](https://github.com/hhorii/capi-rowcache/releases/download/v0.2/cassandra-capiflash-plugin.jar) and associated [capiblock.jar](https://github.com/hhorii/capi-rowcache/releases/download/v0.2/capiblock.jar) to Cassandra's `lib` directory and by specifying necessary properties to the JVM.
 
 ## CAPI-Flash (also known as IBM Data Engine for NoSQL)
 
@@ -8,6 +8,8 @@ CAPI-Flash provides high-throughput low-latency access to flash storage. With th
 
 > IBM Data Engine for NoSQL is an integrated platform for large and fast growing NoSQL data stores. It builds on the CAPI capability of POWER8 systems and provides super-fast access to large flash storage capacity. It delivers high speed access to both RAM and flash storage which can result in significantly lower cost, and higher workload density for NoSQL deployments than a standard RAM-based system. The solution offers superior performance and price-performance to scale out x86 server deployments that are either limited in available memory per server or have flash memory with limited data access latency.
 > -- [IBM Data Engine for NoSQL](https://www.ibm.com/power/solutions/bigdata-analytics-data-engine-nosql)
+
+## CAPI-CommitLog for Apache Cassandra
 
 ## CAPI-RowCache for Apache Cassandra
 
@@ -23,11 +25,11 @@ Performance results can be found in [this page](https://github.com/hhorii/capi-r
 
 ## Download
 
-Go to the [release page](https://github.com/hhorii/capi-rowcache/releases) and download the latest capi-rowcache.jar and capiblock.jar. For Cassandra 4.x, download capi-rowcache-4.jar instead of capi-rowcache.jar.
+Go to the [release page](https://github.com/hhorii/capi-rowcache/releases) and download the latest cassandra-capiflash-plugin.jar and capiblock.jar.
 
 ## How to run
 
-CAPI-RowCache was tested on Cassandra 3.10 and 4.x. It should work with other 3.x releases, too. If you need help in running CAPI-RowCache on other versions of Cassandra, please raise an issue.
+The CAPI-Flash plugin works with Cassandra 4.x. If you would like to run the CAPI-Flash plugin on other versions of Cassandra, please raise an issue.
 
 This section explains how to run CAPI-RowCache with a machine with CAPI-Flash. The next section describes how to run CAPI-RowCache in the emulation mode.
 
