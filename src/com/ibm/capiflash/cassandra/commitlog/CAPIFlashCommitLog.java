@@ -26,7 +26,6 @@ import java.util.Iterator;
 import org.apache.cassandra.db.Mutation;
 import org.apache.cassandra.db.commitlog.CommitLogPosition;
 import org.apache.cassandra.db.commitlog.ICommitLog;
-import org.apache.cassandra.metrics.DefaultNameFactory;
 import org.apache.cassandra.net.MessagingService;
 import org.apache.cassandra.schema.TableId;
 import org.slf4j.Logger;
