@@ -26,6 +26,7 @@ import java.util.Iterator;
 import org.apache.cassandra.db.Mutation;
 import org.apache.cassandra.db.commitlog.CommitLogPosition;
 import org.apache.cassandra.db.commitlog.ICommitLog;
+import org.apache.cassandra.db.commitlog.CommitLogArchiver;
 import org.apache.cassandra.net.MessagingService;
 import org.apache.cassandra.schema.TableId;
 import org.slf4j.Logger;
@@ -243,14 +244,13 @@ class CAPIFlashCommitLog implements ICommitLog {
 	@Override
 	public int recover() throws IOException {
 		long startTime = System.currentTimeMillis();
-		FlashBulkReplayer r = new FlashBulkReplayer();
-                r.recover(fsm);
+		CAPIFlashCommitLogReplayer r = new CAPIFlashCommitLogReplayer(this);
+                r.replayCAPIFlash(fsm);
 		long count = r.blockForWrites();
 		fsm.recycleAfterReplay();
 		long estimatedTime = System.currentTimeMillis() - startTime;
 		logger.error("Replayed " + count + " records in " + estimatedTime + " ms");
 		return (int) count;
-		
 	}
 
 	/**
@@ -285,6 +285,11 @@ class CAPIFlashCommitLog implements ICommitLog {
 	public void forceRecycleAllSegments(Iterable<TableId> droppedCfs) {
 		fsm.forceRecycleAll(droppedCfs);
 	}
+
+        @Override
+        public CommitLogArchiver getArchiver() {
+                return null;
+        }
 
         /**
          * FOR TESTING PURPOSES

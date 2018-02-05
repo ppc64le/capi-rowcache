@@ -68,14 +68,14 @@ class FlashSegmentManager {
 															// bookkeping
 															// purposes
 
-	private final HashMap<Integer, Long> unCommitted;
+        private final HashMap<Long, Integer> unCommitted;
         private final String bookkeeperDevice;
 	private Chunk bookkeeper = null;
 	private volatile FlashSegment active;
 
 	FlashSegmentManager(String device) {
 		bookkeeperDevice = device;
-		unCommitted = new HashMap<Integer, Long>();
+		unCommitted = new HashMap<Long, Integer>();
         }
 
         void start() throws IOException {
@@ -89,17 +89,12 @@ class FlashSegmentManager {
                         if (segID != 0) {// Committed Segments will be 0 unCommitted
 									// Segments will contain the unique id
                                 logger.error(i + " is uncommitted with segment id " + segID);
-                                unCommitted.put(i, segID);
+                                unCommitted.put(segID, i);
+				logger.error(i + " will be replayed");
+                        } else {
+                                freelist.add(i);
                         }
                 }
-
-		for (int i = 0; i < CAPIFlashCommitLog.NUMBER_OF_SEGMENTS; i++) {
-			if (!unCommitted.containsKey(i)) {
-				freelist.add(i);
-			} else {
-				logger.error(i + " will be replayed");
-			}
-		}
 		activateNextSegment();
 	}
 
@@ -153,7 +148,7 @@ class FlashSegmentManager {
                 return active.getContext();
         }
 
-        HashMap<Integer, Long> getUnCommitted() {
+        HashMap<Long, Integer> getUnCommitted() {
                 return unCommitted;
         }
 
@@ -165,12 +160,12 @@ class FlashSegmentManager {
 	 * Zero all bookkeeping segments
 	 */
 	void recycleAfterReplay() throws IOException {
-		for (Integer key : unCommitted.keySet()) {
+		for (Integer value : unCommitted.values()) {
                         util.putLong(0);
-                        bookkeeper.writeBlock(CAPIFlashCommitLog.START_OFFSET + key, 1, util);
+                        bookkeeper.writeBlock(CAPIFlashCommitLog.START_OFFSET + value, 1, util);
                         util.clear();
-                        freelist.add(key);
-                        logger.error("Recycle after replay activating: " + key);
+                        freelist.add(value);
+                        logger.error("Recycle after replay activating: " + value);
 		}
 		unCommitted.clear();
 	}
